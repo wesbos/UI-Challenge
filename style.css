@@ -1,0 +1,209 @@
+:root {
+  --size: 500px;
+}
+
+@property --index {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+@property --count {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+
+html {
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+    "Helvetica Neue", sans-serif;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+body {
+  background-color: white;
+  background-image: radial-gradient(4px circle at 1px 1px, rgba(0, 0, 0, 0.05) 2px, transparent 2px),
+    linear-gradient(to right, rgba(255, 0, 0, 0.1), rgba(255, 255, 0, 0.2));
+  background-size: 20px 20px, 100% 100%;
+  margin: 0;
+}
+
+.resizer {
+  border: 1px dotted rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  resize: both;
+  container-type: size;
+  container-name: ring;
+  width: var(--size);
+  height: var(--size);
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  /* When you are hovering the resize handle, turn off the transition on the items */
+  &:hover:not(:has(.item:is(:hover, :focus))) .item {
+    transition: none;
+  }
+}
+.ring {
+  --item-size: 100px;
+  --padding: 20px;
+  --size: calc(100cqmin - var(--padding) * 3);
+  --radius: calc(var(--size) / 2);
+  --schoochAmount: 15deg;
+  --blue: #2d82f5;
+  --schooch: 0deg;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  position: relative;
+  margin: 0 auto;
+  box-sizing: content-box;
+  &:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    --inside-size: calc(var(--size) + var(--padding) * 2);
+    width: var(--inside-size);
+    height: var(--inside-size);
+    background-color: transparent;
+    border-radius: 50%;
+    left: calc(50% - var(--inside-size) / 2);
+    top: calc(50% - var(--inside-size) / 2);
+    --border-size: calc(var(--item-size) + var(--padding) * 1.5);
+    border: var(--border-size) solid #f6f6f6;
+    box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.5), 0 0 1.5px rgba(0, 0, 0, 0.5);
+    box-sizing: border-box;
+  }
+}
+
+.item {
+  box-sizing: border-box;
+  --padding: 15px;
+  width: calc(var(--item-size) + var(--padding));
+  padding: 0 var(--padding);
+  height: var(--radius);
+  --walk: calc((var(--size) / 2) - var(--item-size) / 2);
+  --index: sibling-index();
+  --count: sibling-count();
+  --degree: calc(var(--index) * (360deg / var(--count)));
+  --rotate: calc(var(--degree) + var(--schooch));
+  position: absolute;
+  transform: translateX(var(--radius)) translateX(calc(var(--item-size) / 2 * -1)) translateX(-7.5px)
+    rotate(var(--rotate));
+  transform-origin: 50% 100%;
+  transition: transform 0.1s ease-in-out;
+  & > img {
+    rotate: calc(var(--rotate) * -1);
+  }
+  &:focus {
+    outline: none;
+    img {
+      filter: drop-shadow(0 0 5px rgba(255, 0, 255, 1));
+    }
+  }
+
+  /* Future Items  */
+  &:is(:hover, :focus) + .item {
+    --schooch: calc(var(--schoochAmount));
+    & + .item {
+      --schooch: calc(var(--schoochAmount) / 2);
+      & + .item {
+        --schooch: calc(var(--schoochAmount) / 3);
+        & + .item {
+          --schooch: calc(var(--schoochAmount) / 4);
+        }
+      }
+    }
+  }
+
+  /* Past Items */
+  &:has(+ .item:is(:hover, :focus)) {
+    /* 1 */
+    --schooch: calc(var(--schoochAmount) * -1);
+  }
+  &:has(+ .item + .item:is(:hover, :focus)) {
+    --schooch: calc(var(--schoochAmount) / 2 * -1);
+  }
+  &:has(+ .item + .item + .item:is(:hover, :focus)) {
+    --schooch: calc(var(--schoochAmount) / 3 * -1);
+  }
+  &:has(+ .item + .item + .item + .item:is(:hover, :focus)) {
+    --schooch: calc(var(--schoochAmount) / 4 * -1);
+  }
+
+  /* When the LAST one is being hovered, apply the schooch to the first four */
+  &:first-child:has(~ .item:is(:hover, :focus):last-child) {
+    --schooch: var(--schoochAmount);
+  }
+  &:nth-child(2):has(~ .item:is(:hover, :focus):last-child) {
+    --schooch: calc(var(--schoochAmount) / 2);
+  }
+  &:nth-child(3):has(~ .item:is(:hover, :focus):last-child) {
+    --schooch: calc(var(--schoochAmount) / 3);
+  }
+  &:nth-child(4):has(~ .item:is(:hover, :focus):last-child) {
+    --schooch: calc(var(--schoochAmount) / 4);
+  }
+
+  img {
+    width: 100%;
+  }
+
+  &:is(:hover, :focus):after {
+    background-image: url("data:image/svg+xml,%3Csvg width='400' height='1047' viewBox='0 0 400 1047' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M199 0H75.5C75.5 0 44.6207 2.5 19.5 26C-5.62069 49.5 1.99999 78.5 1.99999 78.5L98.6147 1009.83C99.6609 1019.91 104.43 1029.24 111.991 1036C119.572 1042.77 129.33 1046.61 139.496 1046.8C139.496 1046.8 169 1044 194 1044C219 1044 261.418 1046.8 261.418 1046.8C271.583 1046.61 281.341 1042.77 288.923 1036C296.483 1029.24 301.252 1019.91 302.299 1009.83L398.913 78.5C398.913 78.5 406.534 49.5 381.413 26C356.293 2.5 325.413 0 325.413 0H199Z' fill='%235979B8'/%3E%3C/svg%3E");
+  }
+
+  /* The blue thing */
+  &:after {
+    content: "";
+    --width: 30px;
+    width: var(--width);
+    height: calc(var(--item-size) * 1.1);
+    position: absolute;
+    top: -3%;
+    left: calc(50% - var(--width) / 2);
+    z-index: -2;
+    background-size: 130% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  &:before {
+    --text: attr(title);
+    content: var(--text);
+    position: absolute;
+    --color: #4f3a51;
+    background: var(--color);
+    border: 1px solid var(--color);
+    box-shadow: inset 0 0 1px rgba(255, 255, 255, 1);
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
+    font-weight: 500;
+    line-height: 1;
+    padding: 7px 10px;
+    width: max-content;
+    overflow: hidden;
+    left: 50%;
+    transform: translateX(-50%) translateY(50%) rotate(calc(var(--rotate) * -1));
+    bottom: 0;
+    color: white;
+    text-align: center;
+    display: none;
+  }
+  &:is(:hover, :focus):before {
+    display: block;
+  }
+}
+
+.app {
+  min-height: 100vh;
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.1));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
