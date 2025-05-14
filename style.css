@@ -45,7 +45,7 @@ body {
   align-items: center;
   padding: 20px;
   /* When you are hovering the resize handle, turn off the transition on the items */
-  &:hover:not(:has(.ring:is(:hover, :focus))) .item {
+  &:active .item {
     transition: none;
   }
 }
