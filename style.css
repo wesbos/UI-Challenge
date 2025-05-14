@@ -45,7 +45,7 @@ body {
   align-items: center;
   padding: 20px;
   /* When you are hovering the resize handle, turn off the transition on the items */
-  &:hover:not(:has(.item:is(:hover, :focus))) .item {
+  &:hover:not(:has(.ring:is(:hover, :focus))) .item {
     transition: none;
   }
 }
@@ -106,6 +106,9 @@ body {
     img {
       filter: drop-shadow(0 0 5px rgba(255, 0, 255, 1));
     }
+  }
+  &:is(:hover, :focus) {
+    /* z-index: 2; */
   }
 
   /* Future Items  */
